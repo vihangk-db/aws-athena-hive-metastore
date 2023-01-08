@@ -74,8 +74,8 @@ public class ListDatabasesHandler extends BaseHMSHandler<ListDatabasesRequest, L
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog");
+      HiveMetaStoreClient client = getUnityClient();
       ListDatabasesResponse response = new ListDatabasesResponse();
       DatabasePaginator paginator = new DatabasePaginator(context, request, client);
       PaginatedResponse<Database> paginatedResponse = paginator.paginateByNames(request.getNextToken(), request.getMaxSize());

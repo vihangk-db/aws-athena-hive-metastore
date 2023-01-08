@@ -24,6 +24,7 @@ import com.amazonaws.athena.hms.GetTableResponse;
 import com.amazonaws.athena.hms.HiveMetaStoreClient;
 import com.amazonaws.athena.hms.HiveMetaStoreConf;
 import com.amazonaws.services.lambda.runtime.Context;
+import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TSerializer;
 
@@ -41,16 +42,64 @@ public class GetTableHandler extends BaseHMSHandler<GetTableRequest, GetTableRes
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Fetching table " + request.getTableName() + " in DB: " + request.getDbName());
       Table table = client.getTable(request.getDbName(), request.getTableName());
-      context.getLogger().log("Fetched table: " + request.getTableName());
+      context.getLogger().log("Fetched Unity Catalog table: " + request.getTableName());
       GetTableResponse response = new GetTableResponse();
       if (table != null) {
         TSerializer serializer = new TSerializer(getTProtocolFactory());
-        response.setTableDesc(serializer.toString(table, StandardCharsets.UTF_8.name()));
+        String tblStr = serializer.toString(table, StandardCharsets.UTF_8.name());
+        context.getLogger().log("Unity Catalog Table JSON: " + tblStr);
+        response.setTableDesc(tblStr);
       }
+      /*
+
+      HiveMetaStoreClient hmsClient = getClient();
+      context.getLogger().log("Fetch HMS table " + request.getTableName() + "in db: " + request.getDbName());
+      Table hmsTable = hmsClient.getTable("testhivedb", "hivetbl1");
+      if (hmsTable != null) {
+        TSerializer serializer = new TSerializer(getTProtocolFactory());
+        String tblStr = serializer.toString(hmsTable, StandardCharsets.UTF_8.name());
+        context.getLogger().log("HMS Table JSON: " + tblStr);
+        context.getLogger().log("Unity Catalog JSON: " +serializer.toString(table, StandardCharsets.UTF_8.name()));
+        context.getLogger().log("Modifying HMS table");
+        hmsTable.setTableName(request.getTableName());
+        hmsTable.setDbName(request.getDbName());
+        // parameters from UC works
+        // context.getLogger().log("Modifying HMS table: Changing parameters from " + hmsTable.getParameters() + " to " + table.getParameters());
+        // hmsTable.setParameters(table.getParameters());
+        hmsTable.setParameters(table.getParameters());
+        // Sd from unity catalog works
+        context.getLogger().log("Modifying HMS table: Changing SD from " +
+                serializer.toString(hmsTable.getSd(), StandardCharsets.UTF_8.name()) + " to " +
+                serializer.toString(table.getSd(), StandardCharsets.UTF_8.name()));
+        StorageDescriptor prevSd = hmsTable.getSd();
+        hmsTable.setSd(table.getSd());
+        // replace location to avoid Permission denied error
+        hmsTable.getSd().setLocation(prevSd.getLocation());
+
+        // table type
+        context.getLogger().log("Modifying the HMS table: Changing table type from " +
+                hmsTable.getTableType() + " to " + table.getTableType()
+        );
+        hmsTable.setTableType(table.getTableType());
+
+        // table owner
+        context.getLogger().log("Modifying the HMS table: Changing table owner from " +
+                hmsTable.getOwner() + " to " + table.getOwner()
+        );
+        hmsTable.setOwner(table.getOwner());
+
+        tblStr = serializer.toString(hmsTable, StandardCharsets.UTF_8.name());
+        context.getLogger().log("New HMS Table JSON: "+ tblStr);
+        // send UC table
+        tblStr = serializer.toString(table, StandardCharsets.UTF_8.name());
+        context.getLogger().log("Sending Unity Catalog table JSON: "+ tblStr);
+        response.setTableDesc(tblStr);
+      }
+       */
       return response;
     }
     catch (Exception e) {

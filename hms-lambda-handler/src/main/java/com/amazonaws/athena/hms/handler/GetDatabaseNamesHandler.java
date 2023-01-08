@@ -39,8 +39,8 @@ public class GetDatabaseNamesHandler extends BaseHMSHandler<GetDatabaseNamesRequ
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity catalog ");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Fetching all database names with filter: " + request.getFilter());
       Set<String> databases = client.getDatabaseNames(request.getFilter());
       context.getLogger().log("Fetched database names: " + (databases == null || databases.isEmpty() ? 0 : databases.size()));

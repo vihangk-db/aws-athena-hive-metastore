@@ -37,8 +37,8 @@ public class TableExistsHandler extends BaseHMSHandler<TableExistsRequest, Table
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Checking if " + request.getDbName() + "." + request.getTableName() + " exists");
       boolean exists = client.tableExists(request.getDbName(), request.getTableName());
       context.getLogger().log("Table exists: " + exists);

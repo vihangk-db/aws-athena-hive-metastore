@@ -24,6 +24,7 @@ import com.amazonaws.athena.hms.GetTableNamesResponse;
 import com.amazonaws.athena.hms.HiveMetaStoreClient;
 import com.amazonaws.athena.hms.HiveMetaStoreConf;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.databricks.unity.UnityCatalogClient;
 
 import java.util.Set;
 
@@ -39,8 +40,8 @@ public class GetTableNamesHandler extends BaseHMSHandler<GetTableNamesRequest, G
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity catalog");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Fetching all table names for DB: " + request.getDbName() + " with filter: " + request.getFilter());
       Set<String> tables = client.getTableNames(request.getDbName(), request.getFilter());
       context.getLogger().log("Fetched table names: " + (tables == null || tables.isEmpty() ? 0 : tables.size()));

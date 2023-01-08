@@ -4,7 +4,7 @@ Metadata:
   AWS::ServerlessRepo::Application:
     Name: AthenaHiveMetastoreFunction
     Description: An Athena Lambda function to interact with Hive Metastore
-    Author: 'default author'
+    Author: 'Vihang Karajgaonkar'
     SpdxLicenseId: Apache-2.0
     LicenseUrl: LICENSE.txt
     ReadmeUrl: README.md

@@ -75,8 +75,8 @@ public class ListTablesHandler extends BaseHMSHandler<ListTablesRequest, ListTab
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog" + conf.getMetastoreUri());
+      HiveMetaStoreClient client = getUnityClient();
       ListTablesResponse response = new ListTablesResponse();
       TablePaginator paginator = new TablePaginator(context, request, client);
       PaginatedResponse<Table> paginatedResponse = paginator.paginateByNames(request.getNextToken(), request.getMaxSize());
@@ -87,7 +87,9 @@ public class ListTablesHandler extends BaseHMSHandler<ListTablesRequest, ListTab
           TSerializer serializer = new TSerializer(getTProtocolFactory());
           List<String> jsonTableList = new ArrayList<>();
           for (Table table : tables) {
-            jsonTableList.add(serializer.toString(table, StandardCharsets.UTF_8.name()));
+            String tblStr = serializer.toString(table, StandardCharsets.UTF_8.name());
+            context.getLogger().log("Adding table : " + tblStr);
+            jsonTableList.add(tblStr);
           }
           response.setTables(jsonTableList);
           context.getLogger().log("Paginated response: entry size: " + jsonTableList.size()

@@ -41,8 +41,8 @@ public class GetDatabaseHandler extends BaseHMSHandler<GetDatabaseRequest, GetDa
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog: ");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Fetching DB: " + request.getDbName());
       Database database = client.getDatabase(request.getDbName());
       context.getLogger().log("Fetched DB: " + database);

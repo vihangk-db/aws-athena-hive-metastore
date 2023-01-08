@@ -37,8 +37,8 @@ public class DbExistsHandler extends BaseHMSHandler<DbExistsRequest, DbExistsRes
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Checking if " + request.getDbName() + " exists");
       boolean exists = client.dbExists(request.getDbName());
       context.getLogger().log("DB exists: " + exists);

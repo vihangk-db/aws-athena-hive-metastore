@@ -43,8 +43,8 @@ public class GetTablesHandler extends BaseHMSHandler<GetTablesRequest, GetTables
   {
     HiveMetaStoreConf conf = getConf();
     try {
-      context.getLogger().log("Connecting to HMS: " + conf.getMetastoreUri());
-      HiveMetaStoreClient client = getClient();
+      context.getLogger().log("Connecting to Unity Catalog");
+      HiveMetaStoreClient client = getUnityClient();
       context.getLogger().log("Fetching tables for DB: " + request.getDbName());
       List<Table> tables = client.getTablesByNames(request.getDbName(), request.getTableNames());
       context.getLogger().log("Fetched tables: " + (tables == null || tables.isEmpty() ? 0 : tables.size()));
@@ -53,7 +53,9 @@ public class GetTablesHandler extends BaseHMSHandler<GetTablesRequest, GetTables
         TSerializer serializer = new TSerializer(getTProtocolFactory());
         List<String> jsonTableList = new ArrayList<>();
         for (Table table : tables) {
-          jsonTableList.add(serializer.toString(table, StandardCharsets.UTF_8.name()));
+          String tblStr = serializer.toString(table, StandardCharsets.UTF_8.name());
+          context.getLogger().log("Table JSON: " + tblStr);
+          jsonTableList.add(tblStr);
         }
         response.setTables(jsonTableList);
       }

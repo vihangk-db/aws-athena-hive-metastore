@@ -23,6 +23,7 @@ import com.amazonaws.athena.hms.HiveMetaStoreClient;
 import com.amazonaws.athena.hms.HiveMetaStoreConf;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.databricks.unity.UnityCatalogClient;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 
@@ -32,6 +33,9 @@ public abstract class BaseHMSHandler<REQUEST, RESPONSE> implements RequestHandle
   private final HiveMetaStoreConf conf;
   // hive metastore client
   private final HiveMetaStoreClient client;
+  private static final String endpoint = "https://e2-dogfood-unity-catalog-us-east-1.staging.cloud.databricks.com/api/2.0/unity-catalog";
+  private static final String token = "dummy_token";
+  private static final String defaultCatalog = "vihang_uc_hms_catalog";
 
   public BaseHMSHandler(HiveMetaStoreConf conf, HiveMetaStoreClient client)
   {
@@ -47,6 +51,11 @@ public abstract class BaseHMSHandler<REQUEST, RESPONSE> implements RequestHandle
   public HiveMetaStoreClient getClient()
   {
     return client;
+  }
+
+  public UnityCatalogClient getUnityClient()
+  {
+    return new UnityCatalogClient(defaultCatalog, token, endpoint);
   }
 
   public TProtocolFactory getTProtocolFactory()
